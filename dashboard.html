@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Eat and Drink Restaurant</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Welcome, User!</h1>
+            <h4>Your personalized dashboard</h4>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#orders">My Orders</a></li>
+                <li><a href="#favorites">Favorite Dishes</a></li>
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="orders">
+            <h2>Your Orders</h2>
+            <div id="orderList">
+                <!-- User orders fetched from API -->
+            </div>
+        </section>
+
+        <section id="favorites">
+            <h2>Your Favorite Dishes</h2>
+            <div id="favoritesList">
+                <!-- Favorite dishes fetched from API -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Eat and Drink Restaurant. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Define API key and base URL
+        const API_KEY = '80ed58191b6d494ebc8bec8997791dc4';
+        const BASE_URL = 'https://api.spoonacular.com';
+
+        // Function to fetch favorite dishes
+        async function fetchFavorites() {
+            try {
+                const response = await fetch(`${BASE_URL}/recipes/random?number=5&apiKey=${API_KEY}`);
+                const data = await response.json();
+                console.log("Favorites:", data);
+                displayFavorites(data.recipes);
+            } catch (error) {
+                console.error("Error fetching favorites:", error);
+            }
+        }
+
+        // Display favorite dishes in the DOM
+        function displayFavorites(favorites) {
+            const favoritesList = document.getElementById('favoritesList');
+            favoritesList.innerHTML = ''; // Clear previous content
+
+            if (favorites.length === 0) {
+                favoritesList.innerHTML = '<p>No favorite dishes found.</p>';
+                return;
+            }
+
+            favorites.forEach(dish => {
+                const dishItem = document.createElement('div');
+                dishItem.classList.add('favorite-item');
+                dishItem.innerHTML = `
+                    <h3>${dish.title}</h3>
+                    <img src="${dish.image}" alt="${dish.title}" />
+                `;
+                favoritesList.appendChild(dishItem);
+            });
+        }
+
+        // Function to fetch orders (this is a placeholder for your own backend logic)
+        async function fetchOrders() {
+            try {
+                // Replace with actual backend call to fetch orders
+                const orders = [
+                    { id: 1, total: 25.99, status: 'Delivered' },
+                    { id: 2, total: 14.99, status: 'Preparing' }
+                ];
+                console.log("Orders:", orders);
+                displayOrders(orders);
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+            }
+        }
+
+        // Display orders in the DOM
+        function displayOrders(orders) {
+            const orderList = document.getElementById('orderList');
+            orderList.innerHTML = ''; // Clear any previous content
+
+            if (orders.length === 0) {
+                orderList.innerHTML = '<p>No orders found.</p>';
+                return;
+            }
+
+            orders.forEach(order => {
+                const orderItem = document.createElement('div');
+                orderItem.classList.add('order-item');
+                orderItem.innerHTML = `
+                    <h3>Order #${order.id}</h3>
+                    <p>Total: $${order.total}</p>
+                    <p>Status: ${order.status}</p>
+                `;
+                orderList.appendChild(orderItem);
+            });
+        }
+
+        // Fetch data when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchOrders();
+            fetchFavorites();
+        });
+    </script>
+</body>
+</html>
