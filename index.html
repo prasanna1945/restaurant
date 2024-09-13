@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eat and Drink Restaurant</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Eat and Drink Restaurant</h1>
+            <h4>Have Fun!!!</h4>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="/signup">Sign Up</a></li>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/dashboard">Dashboard</a></li>
+                <li><a href="/logout">Logout</a></li>
+                <li><a href="#" onclick="viewCart()">Cart (<span id="cart-count">0</span>)</a></li>
+            </ul>
+        </div>
+    </nav>
+    <nav class="menu">
+    <div>
+        <ul>
+            <li><a href="#starters">Starters</a></li>
+            <li><a href="#main-course">Main Course</a></li>
+            <li><a href="#desserts">Desserts</a></li>
+            <li><a href="#drinks">Drinks</a></li>
+        </ul>
+    </div>
+    </nav>
+    <main class="container">
+        <!-- Sections for recipes -->
+        <section id="starters">
+            <div class="container">
+                <h2>Starters</h2>
+                <div id="starterList" class="recipes"></div> <!-- Fetched from API -->
+            </div>
+        </section>
+
+        <section id="main-course">
+            <div class="container">
+                <h2>Main Course</h2>
+                <div id="mainCourseList" class="recipes"></div> <!-- Fetched from API -->
+            </div>
+        </section>
+
+        <section id="desserts">
+            <div class="container">
+                <h2>Desserts</h2>
+                <div id="dessertList" class="recipes"></div> <!-- Fetched from API -->
+            </div>
+        </section>
+
+        <section id="drinks">
+            <div class="container">
+                <h2>Drinks</h2>
+                <div id="drinkList" class="recipes"></div> <!-- Fetched from API -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Eat and Drink Restaurant. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript for fetching recipes -->
+    <script>
+        const apiKey = '80ed58191b6d494ebc8bec8997791dc4'; // Replace with your actual Spoonacular API key
+        const cart = [];
+
+        // Function to add items to the cart
+        function addToCart(item, price) {
+            cart.push({ item, price });
+            document.getElementById('cart-count').innerText = cart.length;
+            alert(item + " added to your cart!");
+        }
+
+        // Function to view the cart
+        function viewCart() {
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+
+            let cartDetails = "Your Cart:\n";
+            let total = 0;
+
+            cart.forEach((entry, index) => {
+                cartDetails += `${index + 1}. ${entry.item} - $${entry.price.toFixed(2)}\n`;
+                total += entry.price;
+            });
+
+            cartDetails += `\nTotal: $${total.toFixed(2)}\n\nDo you want to place the order?`;
+            
+            if (confirm(cartDetails)) {
+                placeOrder();
+            }
+        }
+
+        // Function to place the order
+        function placeOrder() {
+            cart.length = 0; // This empties the cart array without reassigning it
+            document.getElementById('cart-count').innerText = "0"; // Update the cart count display
+            alert("Thank you for your order! Your total amount is billed.");
+        }
+        
+
+        // Function to fetch recipes using Spoonacular API
+        async function fetchRecipes(category, containerId) {
+            const url = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${apiKey}&type=${category}&number=5`; // Fetch 5 recipes for each category
+            const response = await fetch(url);
+            const data = await response.json();
+            const recipes = data.results;
+            const container = document.getElementById(containerId);
+
+            recipes.forEach(recipe => {
+                const recipeDiv = document.createElement('div');
+                recipeDiv.classList.add('recipe');
+
+                const recipeImage = document.createElement('img');
+                recipeImage.src = recipe.image;
+                recipeImage.alt = recipe.title;
+                recipeImage.classList.add('menu-image');
+
+                const recipeTitle = document.createElement('h3');
+                recipeTitle.innerText = recipe.title;
+
+                const price = (Math.random() * 10 + 5).toFixed(2); // Random price between $5.00 and $15.00
+                const priceTag = document.createElement('p');
+                priceTag.classList.add('price');
+                priceTag.innerText = `$${price}`;
+
+                const addToCartBtn = document.createElement('button');
+                addToCartBtn.classList.add('add-to-cart');
+                addToCartBtn.innerText = 'Add to Cart';
+                addToCartBtn.onclick = () => addToCart(recipe.title, parseFloat(price));
+
+                recipeDiv.appendChild(recipeImage);
+                recipeDiv.appendChild(recipeTitle);
+                recipeDiv.appendChild(priceTag);
+                recipeDiv.appendChild(addToCartBtn);
+
+                container.appendChild(recipeDiv);
+            });
+        }
+
+        // Fetch recipes for different categories
+        fetchRecipes('appetizer', 'starterList');
+        fetchRecipes('main course', 'mainCourseList');
+        fetchRecipes('dessert', 'dessertList');
+        fetchRecipes('drink', 'drinkList');
+    </script>
+    <script src="/script.js"></script>
+</body>
+</html>
+
